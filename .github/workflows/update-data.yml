@@ -26,19 +26,26 @@ jobs:
       - name: Install R dependencies
         run: |
           install.packages("remotes")
-          remotes::install_cran(c("httr", "jsonlite", "R6", "curl"))
+          remotes::install_cran(c("httr", "jsonlite", "R6", "curl", "rappdirs"))
           remotes::install_cran("AzureAuth")
           remotes::install_cran("AzureGraph")
           remotes::install_cran("Microsoft365R")
           remotes::install_cran("readxl")
         shell: Rscript {0}
       
-      - name: Authenticate Microsoft365R
+      - name: Setup Azure token directory
+        run: |
+          mkdir -p ~/.local/share/AzureR
+          mkdir -p ~/.config/AzureR
+      
+      - name: Restore Microsoft365R token
         env:
           MICROSOFT365R_TOKEN: ${{ secrets.MICROSOFT365R_TOKEN }}
         run: |
-          mkdir -p ~/.config/AzureR
-          echo $MICROSOFT365R_TOKEN | base64 -d > ~/.config/AzureR/AzureR.rds
+          echo "$MICROSOFT365R_TOKEN" | base64 -d > ~/.local/share/AzureR/AzureR.rds
+          cp ~/.local/share/AzureR/AzureR.rds ~/.config/AzureR/AzureR.rds
+          ls -la ~/.local/share/AzureR/
+          ls -la ~/.config/AzureR/
         shell: bash
       
       - name: Run update script
