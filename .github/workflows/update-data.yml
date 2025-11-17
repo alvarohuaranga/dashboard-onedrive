@@ -1,0 +1,78 @@
+name: Actualizar datos desde OneDrive
+
+on:
+  schedule:
+    # Ejecutar diariamente a las 11:00 AM hora Perú (UTC-5 = 16:00 UTC)
+    - cron: '0 16 * * *'
+  workflow_dispatch: # Permite ejecutar manualmente
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.3.0'
+      
+      - name: Install dependencies
+        run: |
+          install.packages(c("Microsoft365R", "readxl"))
+        shell: Rscript {0}
+      
+      - name: Authenticate Microsoft365R
+        env:
+          MICROSOFT365R_TOKEN: ${{ secrets.MICROSOFT365R_TOKEN }}
+        run: |
+          mkdir -p ~/.config/AzureR
+          echo $MICROSOFT365R_TOKEN | base64 -d > ~/.config/AzureR/AzureR.rds
+        shell: bash
+      
+      - name: Run update script
+        run: Rscript update_data.R
+      
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add datos.csv
+          git commit -m "Actualizar datos - $(date +'%Y-%m-%d %H:%M:%S')" || echo "No hay cambios"
+          git push
+
+
+
+## 🔍 **Verifica la estructura final:**
+
+# Tu carpeta debería verse así:
+
+#dashboard-onedrive/
+#├── .github/
+#│   └── workflows/
+#│       └── update-data.yml    ← NUEVO
+#├── README.md
+#├── update_data.R
+#└── datos.csv
+
+#steps:
+#  - Descarga el repositorio
+#  - Instala R
+#  - Instala los paquetes necesarios
+#  - Se autentica en OneDrive (con el token que configuraremos después)
+#  - Ejecuta update_data.R
+#  - Sube el datos.csv actualizado a GitHub
+
+
+#⏰ Nota sobre la hora:
+#cron: '0 16 * * *' significa:
+
+#16:00 UTC = 11:00 AM hora Perú
+
+#Si quieres otra hora, puedes cambiar el número. Ejemplos:
+
+#'0 12 * * *' = 7:00 AM Perú
+#'0 18 * * *' = 1:00 PM Perú
+#'0 22 * * *' = 5:00 PM Perú
