@@ -2,9 +2,8 @@ name: Actualizar datos desde OneDrive
 
 on:
   schedule:
-    # Ejecutar diariamente a las 11:00 AM hora Perú (UTC-5 = 16:00 UTC)
     - cron: '0 16 * * *'
-  workflow_dispatch: # Permite ejecutar manualmente
+  workflow_dispatch:
 
 jobs:
   update-data:
@@ -19,9 +18,19 @@ jobs:
         with:
           r-version: '4.3.0'
       
-      - name: Install dependencies
+      - name: Install system dependencies
         run: |
-          install.packages(c("Microsoft365R", "readxl"))
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev
+      
+      - name: Install R dependencies
+        run: |
+          install.packages("remotes")
+          remotes::install_cran(c("httr", "jsonlite", "R6", "curl"))
+          remotes::install_cran("AzureAuth")
+          remotes::install_cran("AzureGraph")
+          remotes::install_cran("Microsoft365R")
+          remotes::install_cran("readxl")
         shell: Rscript {0}
       
       - name: Authenticate Microsoft365R
