@@ -76,3 +76,36 @@ jobs:
 #'0 12 * * *' = 7:00 AM Perú
 #'0 18 * * *' = 1:00 PM Perú
 #'0 22 * * *' = 5:00 PM Perú
+
+
+## 🔍 **Verifica la estructura final:**
+
+# Tu carpeta debería verse así:
+
+#dashboard-onedrive/
+#├── .github/
+#│   └── workflows/
+#│       └── update-data.yml    ← NUEVO
+#├── README.md
+#├── update_data.R
+#└── datos.csv
+
+#steps:
+#  - Descarga el repositorio
+#  - Instala R
+#  - Instala los paquetes necesarios
+#  - Se autentica en OneDrive (con el token que configuraremos después)
+#  - Ejecuta update_data.R
+#  - Sube el datos.csv actualizado a GitHub
+
+
+#⏰ Nota sobre la hora:
+#cron: '0 16 * * *' significa:
+
+#16:00 UTC = 11:00 AM hora Perú
+
+#Si quieres otra hora, puedes cambiar el número. Ejemplos:
+
+#'0 12 * * *' = 7:00 AM Perú
+#'0 18 * * *' = 1:00 PM Perú
+#'0 22 * * *' = 5:00 PM Perú
